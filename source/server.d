@@ -6,6 +6,9 @@ import std.path;
 import http_request;
 import http_response;
 
+
+
+
 class Server {
   private:
   Socket server_;
@@ -23,17 +26,23 @@ class Server {
   }
 
   void run(int max_client=1) {
+    // TODO: Fix it
+    string[string] contentTypes = [
+      ".html": "text/html; charset=utf-8",
+      ".css": "text/css"
+    ];
+
     server_.bind(new InternetAddress(port_));
     server_.listen(max_client);
     while(1) {
       Socket client = server_.accept();
       try {
 	HTTPRequest req = new HTTPRequest(client);
-	auto body = req.read();
+	// TODO: Fix it
+	req.read();
 	writeln("* request acceptted");
 
 	HTTPResponse res = new HTTPResponse();
-	res.set_header("Content-Type", "text/html; charset=utf-8");
 	string path = req.getPath();
 	string filepath;
 	if (path == "/") {
@@ -42,6 +51,9 @@ class Server {
 	  filepath = "./public" ~ buildNormalizedPath(path);
 	}
 	res.set_body(cast(ubyte[])read(filepath));
+	string ext = extension(filepath);
+	string contentType = contentTypes.get(ext, "text/plain");
+	res.set_header("Content-Type", contentType);
 	auto data = res.generate_data();
 	writeln("* response sending");
 	client.send(data);
