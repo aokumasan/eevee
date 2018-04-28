@@ -14,6 +14,12 @@ class HTTPRequest {
     client_  = client;
   }
 
+  @property
+  {
+    string data() const { return data_; }
+    void data(string data) { data_ = data; }
+  }
+
   char[1024] read() {
     // TODO: Fix buffer length to read
     char[1024] buffer;
