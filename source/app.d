@@ -1,6 +1,7 @@
-import std.stdio;
+import server;
 
 void main()
 {
-	writeln("Edit source/app.d to start your project.");
+  Server srv = new Server(8080);
+  srv.run();
 }
