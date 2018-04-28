@@ -39,7 +39,15 @@ unittest {
 	rs.code.shouldEqual(200);
 	rs.responseHeaders["content-type"].shouldEqual("text/html; charset=utf-8");
 	rs.responseBody.shouldEqual(readText("./public/index.html"));
+    }),
+    it("Should return css", delegate() {
+	Request rq = Request();
+	Response rs = rq.get("http://localhost:8080/css/style.css");
+	rs.code.shouldEqual(200);
+	rs.responseHeaders["content-type"].shouldEqual("text/css");
+	rs.responseBody.shouldEqual(readText("./public/css/style.css"));
     })
+
   );
 }
 
