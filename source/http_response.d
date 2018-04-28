@@ -5,11 +5,9 @@ import std.conv : to;
 class HTTPResponse {
   private:
   string[string] header_;
-  string body_;
+  ubyte[] body_;
 
   int calc_content_length() {
-    writeln(body_);
-    writeln(body_.length);
     return cast(int)(body_.length);
   }
 
@@ -36,7 +34,7 @@ class HTTPResponse {
     header_.remove(key);
   }
 
-  void set_body(string body) {
+  void set_body(ubyte[] body) {
     body_ = body;
   }
 
@@ -45,12 +43,8 @@ class HTTPResponse {
     data ~= generate_status_line();
     data ~= generate_header();
     data ~= "\r\n";
-    data ~= body_;
+    data ~= cast(string)body_;
     return data;
-  }
-
-  void write(string body) {
-    body_ = body;
   }
 
 }
