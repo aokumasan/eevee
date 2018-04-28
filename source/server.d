@@ -1,18 +1,15 @@
 import std.stdio;
 import std.socket;
-import std.file;
 import std.path;
 
 import http_request;
 import http_response;
 
-
-
-
 class Server {
   private:
   Socket server_;
   ushort port_;
+
 
   public:
   this(ushort port) {
@@ -26,12 +23,6 @@ class Server {
   }
 
   void run(int max_client=1) {
-    // TODO: Fix it
-    string[string] contentTypes = [
-      ".html": "text/html; charset=utf-8",
-      ".css": "text/css"
-    ];
-
     server_.bind(new InternetAddress(port_));
     server_.listen(max_client);
     while(1) {
@@ -50,11 +41,8 @@ class Server {
 	} else {
 	  filepath = "./public" ~ buildNormalizedPath(path);
 	}
-	res.set_body(cast(ubyte[])read(filepath));
-	string ext = extension(filepath);
-	string contentType = contentTypes.get(ext, "text/plain");
-	res.set_header("Content-Type", contentType);
-	auto data = res.generate_data();
+	res.setBodyFromPath(filepath);
+	auto data = res.generateData();
 	writeln("* response sending");
 	client.send(data);
       } catch (Exception e) {
@@ -66,4 +54,5 @@ class Server {
       }
     }
   }
+
 }
