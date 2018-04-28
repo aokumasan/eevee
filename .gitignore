@@ -1,0 +1,14 @@
+.dub
+docs.json
+__dummy.html
+docs/
+eevee.so
+eevee.dylib
+eevee.dll
+eevee.a
+eevee.lib
+eevee-test-*
+*.exe
+*.o
+*.obj
+*.lst

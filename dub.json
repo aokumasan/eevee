@@ -1,0 +1,9 @@
+{
+	"name": "eevee",
+	"authors": [
+		"alice02"
+	],
+	"description": "A HTTP server written in D.",
+	"copyright": "Copyright © 2018, alice02",
+	"license": "proprietary"
+}
