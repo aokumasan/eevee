@@ -5,5 +5,8 @@
 	],
 	"description": "A HTTP server written in D.",
 	"copyright": "Copyright © 2018, alice02",
-	"license": "proprietary"
+	"license": "proprietary",
+	"dependencies": {
+		"bdd": "~>1.3.0"
+	}
 }
