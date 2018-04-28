@@ -30,6 +30,20 @@ unittest {
 	socket.close();
     }),
   );
+
+  describe("HTTPRequest#getMethod",
+    it("Should return correct method", delegate() {
+      auto socket = new Socket(AddressFamily.INET, SocketType.STREAM, ProtocolType.TCP);
+      HTTPRequest req = new HTTPRequest(socket);
+      string[] methods = [
+        "GET", "POST", "PUT", "DELETE", "HEAD"
+      ];
+      foreach (method; methods) {
+        req.data = method ~ " /test/index.html HTTP/1.0\r\nContent-Type: text/html; charset=uth-8\r\n\r\n";
+        req.getMethod().shouldEqual(method);
+      }
+    })
+  );
 }
 
 int main() {

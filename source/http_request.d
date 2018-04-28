@@ -30,17 +30,18 @@ class HTTPRequest {
 
   string getPath() {
     auto statusLine = lineSplitter(data_).array[0];
-    writeln(statusLine);
-    auto path = statusLine.split(" ")[1];
-    return path;
+    return statusLine.split(" ")[1];
+  }
+
+  string getMethod() {
+    auto statusLine = lineSplitter(data_).array[0];
+    return statusLine.split(" ")[0];
   }
 
   void getHeader() {
-
   }
 
   void getBody() {
-
   }
 
 }
