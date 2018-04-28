@@ -46,8 +46,15 @@ unittest {
 	rs.code.shouldEqual(200);
 	rs.responseHeaders["content-type"].shouldEqual("text/css");
 	rs.responseBody.shouldEqual(readText("./public/css/style.css"));
+    }),
+    it("Should return png image", delegate() {
+	Request rq = Request();
+	Response rs = rq.get("http://localhost:8080/img/parrot.png");
+	rs.code.shouldEqual(200);
+	rs.responseHeaders["content-type"].shouldEqual("image/png");
+	auto image = cast(ubyte[])read("./public/img/parrot.png");
+	rs.responseBody.shouldEqual(cast(string)image);
     })
-
   );
 }
 
