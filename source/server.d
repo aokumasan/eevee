@@ -1,9 +1,10 @@
 import std.stdio;
 import std.socket;
+import std.file;
+import std.path;
 
 import http_request;
 import http_response;
-
 
 class Server {
   private:
@@ -26,17 +27,31 @@ class Server {
     server_.listen(max_client);
     while(1) {
       Socket client = server_.accept();
-      HTTPRequest req = new HTTPRequest(client);
-      auto body = req.read();
-      writeln(body);
-      HTTPResponse res = new HTTPResponse();
-      res.set_header("Content-Type", "text/html; charset=utf-8");
-      res.set_body("<h1>Hello, world!!</h1>");
-      auto data = res.generate_data();
-      writeln(data);
-      client.send(data);
-      client.shutdown(SocketShutdown.BOTH);
-      client.close();
+      try {
+	HTTPRequest req = new HTTPRequest(client);
+	auto body = req.read();
+	writeln("* request acceptted");
+
+	HTTPResponse res = new HTTPResponse();
+	res.set_header("Content-Type", "text/html; charset=utf-8");
+	string path = req.getPath();
+	string filepath;
+	if (path == "/") {
+	  filepath = "./public/index.html";
+	} else {
+	  filepath = "./public" ~ buildNormalizedPath(path);
+	}
+	res.set_body(cast(ubyte[])read(filepath));
+	auto data = res.generate_data();
+	writeln("* response sending");
+	client.send(data);
+      } catch (Exception e) {
+	writeln(e);
+      }
+      finally {
+	client.shutdown(SocketShutdown.BOTH);
+	client.close();
+      }
     }
   }
 }
