@@ -47,10 +47,10 @@ class HTTPResponse {
     string[string] contentTypes = [
       ".html": "text/html; charset=utf-8",
       ".css": "text/css",
-      ".png": "text/png",
-      ".gif": "text/gif",
-      ".jpeg": "text/jpeg",
-      ".jpg": "text/jpeg",
+      ".png": "image/png",
+      ".gif": "image/gif",
+      ".jpeg": "image/jpeg",
+      ".jpg": "image/jpeg",
       ".js": "text/javascript"
     ];
     // default content type is text/plain
