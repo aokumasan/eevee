@@ -1,7 +1,14 @@
 import server;
+import dyaml;
+import std.getopt;
 
-void main()
+string configPath = "config.yml";
+
+void main(string[] args)
 {
-  Server srv = new Server(8080);
-  srv.run(5);
+  getopt(args, "config|c", &configPath);
+  auto config = Loader(configPath).load();
+
+  Server srv = new Server(config);
+  srv.run();
 }

@@ -1,8 +1,10 @@
 import std.stdio;
 import std.socket;
+import std.conv;
 import std.path;
 import std.file;
 import std.algorithm: canFind;
+import dyaml;
 
 import http_request;
 import http_response;
@@ -21,23 +23,19 @@ class MethodNotAllowedException : Exception
 class Server {
   private:
   Socket server_;
-  ushort port_;
-
+  Node config_;
 
   public:
-  this(ushort port) {
+  this(Node config) {
+    config_ = config;
     server_ = new TcpSocket();
     server_.setOption(SocketOptionLevel.SOCKET, SocketOption.REUSEADDR, true);
-    port_ = port;
   }
 
-  @property {
-    int port() const { return port_; }
-  }
+  void run() {
+    server_.bind(new InternetAddress(config_["port"].as!ushort));
+    server_.listen(config_["max_connections"].as!int);
 
-  void run(int maxClient=1) {
-    server_.bind(new InternetAddress(port_));
-    server_.listen(maxClient);
     while(1) {
       Socket client = server_.accept();
       HTTPRequest req = new HTTPRequest(client);
