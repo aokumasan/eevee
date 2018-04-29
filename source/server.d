@@ -45,6 +45,8 @@ class Server {
     while(1) {
       Socket client = server_.accept();
       new Thread(() => process(client)).start;
+      // Workaround for using socket in thread
+      Thread.sleep( dur!("usecs")(100) );
     }
   }
 
