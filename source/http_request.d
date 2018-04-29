@@ -1,7 +1,7 @@
 import std.socket;
-
 import std.stdio;
 import std.string;
+import std.conv : to;
 
 class HTTPRequest {
   private:
@@ -19,22 +19,25 @@ class HTTPRequest {
     void data(string data) { data_ = data; }
   }
 
-  char[1024] read() {
+  string read() {
     // TODO: Fix buffer length to read
     char[1024] buffer;
     client_.receive(buffer);
-    data_ = cast(string)buffer;
-    return buffer;
+    string b = to!string(buffer);
+    data_ = b;
+    return b;
   }
 
   string getPath() {
-    auto statusLine = data_.split("\r\n")[0];
-    return statusLine.split(" ")[1];
+    string statusLine = data_.split("\r\n")[0];
+    string p = statusLine.split(" ")[1];
+    return p;
   }
 
   string getMethod() {
-    auto statusLine = data_.split("\r\n")[0];
-    return statusLine.split(" ")[0];
+    string statusLine = data_.split("\r\n")[0];
+    string m = statusLine.split(" ")[0];
+    return m;
   }
 
   void getHeader() {

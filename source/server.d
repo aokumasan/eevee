@@ -44,7 +44,7 @@ class Server {
       Socket client = server_.accept();
       new Thread(() => process(client)).start;
       // Workaround for using socket in thread
-      Thread.sleep( dur!("usecs")(100) );
+      Thread.sleep( dur!("usecs")(1000) );
     }
   }
 
@@ -91,7 +91,7 @@ class Server {
 	logf(LogLevel.info, "%s %s HTTP/1.0 405", method, path);
 	client.send(data);
       } catch (Exception e) {
-	log(LogLevel.error, e);
+	writeln(e);
 	HTTPResponse res = new HTTPResponse();
 	res.setHeader("Content-Type", "text/html; charset=utf-8");
 	res.setBody(cast(ubyte[])"<h1>Internal Server Error</h1>");
