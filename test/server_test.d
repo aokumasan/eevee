@@ -11,8 +11,8 @@ import std.stdio;
 import server;
 
 unittest {
-  Server srv = new Server(8080);
-  Thread th = new Thread(() => srv.run());
+  Server srv = new Server();
+  Thread th = new Thread(() => srv.run(8080, 5));
   th.start;
 
   // Workaround for suppress the request log (https://github.com/ikod/dlang-requests/issues/9#issuecomment-219279562)
