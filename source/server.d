@@ -5,7 +5,6 @@ import std.path;
 import std.file;
 import core.thread;
 import std.algorithm: canFind;
-import dyaml;
 import std.experimental.logger;
 
 import http_request;
@@ -25,20 +24,17 @@ class MethodNotAllowedException : Exception
 class Server {
   private:
   Socket server_;
-  Node config_;
 
   public:
-  this(Node config) {
-    config_ = config;
+  this() {
     server_ = new TcpSocket();
     server_.setOption(SocketOptionLevel.SOCKET, SocketOption.REUSEADDR, true);
     setupLogger();
   }
 
-  void run() {
-    ushort port = config_["port"].as!ushort;
+  void run(ushort port=8080, int maxConnections=512, ) {
     server_.bind(new InternetAddress(port));
-    server_.listen(config_["max_connections"].as!int);
+    server_.listen(maxConnections);
 
     log(LogLevel.info, "Eevee listening on " ~ port.to!string);
 
@@ -67,7 +63,7 @@ class Server {
 	res.setBodyFromPath(getLocalFile(path));
 	auto data = res.generateData(200);
 	logf(LogLevel.info, "%s %s HTTP/1.0 200", method, path);
-	log(LogLevel.trace, req.data);
+	// log(LogLevel.trace, req.data);
 	client.send(data);
       } catch (FileException e) {
 	HTTPResponse res = new HTTPResponse();
@@ -106,8 +102,8 @@ class Server {
   }
 
   void setupLogger() {
-    string type = config_["log"]["type"].as!string;
-    string level = config_["log"]["level"].as!string;
+    string type = "stderr";
+    string level = "info";
 
     switch(level) {
       case "trace":
@@ -128,7 +124,7 @@ class Server {
     }
 
     if (type == "file") {
-      string logfile = config_["log"]["path"].as!string;
+      string logfile = "log/eevee.log";
       sharedLog = new FileLogger(logfile);
     }
   }

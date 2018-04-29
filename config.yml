@@ -1,6 +1,0 @@
-port: 8080
-root: ./public
-max_connections: 1024
-log:
-  level: trace
-  type: stderr

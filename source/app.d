@@ -1,14 +1,16 @@
 import server;
-import dyaml;
 import std.getopt;
 
-string configPath = "config.yml";
+ushort port = 8080;
+int maxConnections = 512;
 
 void main(string[] args)
 {
-  getopt(args, "config|c", &configPath);
-  auto config = Loader(configPath).load();
+  getopt(args,
+	 "port|p", &port,
+	 "maxConnections|m", &maxConnections
+	 );
 
-  Server srv = new Server(config);
-  srv.run();
+  Server srv = new Server();
+  srv.run(port, maxConnections);
 }
