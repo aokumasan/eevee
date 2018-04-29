@@ -2,9 +2,21 @@ import std.stdio;
 import std.socket;
 import std.path;
 import std.file;
+import std.algorithm: canFind;
 
 import http_request;
 import http_response;
+
+const string[] availableMethods = [
+  "GET", "HEAD"
+];
+
+class MethodNotAllowedException : Exception
+{
+  this(string msg, string file = __FILE__, size_t line = __LINE__) {
+    super(msg, file, line);
+  }
+}
 
 class Server {
   private:
@@ -36,6 +48,9 @@ class Server {
       string path;
       try {
 	method = req.getMethod();
+	if (!availableMethods.canFind(method)) {
+	  throw new  MethodNotAllowedException("The specified method is not allowed");
+	}
 	path = req.getPath();
 	HTTPResponse res = new HTTPResponse(method);
 	res.setBodyFromPath(getLocalFile(path));
@@ -46,6 +61,12 @@ class Server {
 	res.setHeader("Content-Type", "text/html; charset=utf-8");
 	res.setBody(cast(ubyte[])"<h1>Not Found</h1>");
 	auto data = res.generateData(404);
+	client.send(data);
+      } catch (MethodNotAllowedException e) {
+	HTTPResponse res = new HTTPResponse(method);
+	res.setHeader("Content-Type", "text/html; charset=utf-8");
+	res.setBody(cast(ubyte[])"<h1>Method Not Allowed</h1>");
+	auto data = res.generateData(405);
 	client.send(data);
       } catch (Exception e) {
 	writeln(e);
