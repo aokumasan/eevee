@@ -2,5 +2,5 @@ port: 8080
 root: ./public
 max_connections: 1024
 log:
-  level: info
-  file: ./log/eevee.log
+  level: trace
+  type: stderr
