@@ -39,7 +39,8 @@ class HTTPResponse {
       200: "OK",
       400: "Bad Request",
       404: "Not Found",
-      405: "Method Not Allowed"
+      405: "Method Not Allowed",
+      500: "Internal Server Error"
     ];
     return "HTTP/1.0 " ~ to!string(code) ~ " " ~ to!string(table[code]) ~ "\r\n";
   }

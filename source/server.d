@@ -70,6 +70,11 @@ class Server {
 	client.send(data);
       } catch (Exception e) {
 	writeln(e);
+	HTTPResponse res = new HTTPResponse();
+	res.setHeader("Content-Type", "text/html; charset=utf-8");
+	res.setBody(cast(ubyte[])"<h1>Internal Server Error</h1>");
+	auto data = res.generateData(500);
+	client.send(data);
       } finally {
 	client.shutdown(SocketShutdown.BOTH);
 	client.close();
