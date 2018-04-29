@@ -34,8 +34,13 @@ class HTTPResponse {
     return header;
   }
 
-  string generateStatusLine() {
-    return "HTTP/1.0 200 OK\r\n";
+  string generateStatusLine(int code) {
+    string[int] table = [
+      200: "OK",
+      400: "BadRequest",
+      404: "NotFound"
+    ];
+    return "HTTP/1.0 " ~ to!string(code) ~ " " ~ to!string(table[code]) ~ "\r\n";
   }
 
   void deleteHeader(string key) {
@@ -68,9 +73,9 @@ class HTTPResponse {
     setBody(cast(ubyte[])read(filepath));
   }
 
-  string generateData() {
+  string generateData(int code) {
     string data = "";
-    data ~= generateStatusLine();
+    data ~= generateStatusLine(code);
     data ~= generateHeader();
     data ~= "\r\n";
     if (method_ == "HEAD") {

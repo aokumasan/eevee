@@ -1,6 +1,7 @@
 import std.stdio;
 import std.socket;
 import std.path;
+import std.file;
 
 import http_request;
 import http_response;
@@ -22,26 +23,32 @@ class Server {
     int port() const { return port_; }
   }
 
-  void run(int max_client=1) {
+  void run(int maxClient=1) {
     server_.bind(new InternetAddress(port_));
-    server_.listen(max_client);
+    server_.listen(maxClient);
     while(1) {
       Socket client = server_.accept();
-      try {
-	HTTPRequest req = new HTTPRequest(client);
-	// TODO: Fix it
-	req.read();
+      HTTPRequest req = new HTTPRequest(client);
+      // TODO: Fix it
+      req.read();
 
-	string method = req.getMethod();
-	string path = req.getPath();
+      string method;
+      string path;
+      try {
+	method = req.getMethod();
+	path = req.getPath();
 	HTTPResponse res = new HTTPResponse(method);
 	res.setBodyFromPath(getLocalFile(path));
-	auto data = res.generateData();
+	auto data = res.generateData(200);
+	client.send(data);
+      } catch (FileException e) {
+	HTTPResponse res = new HTTPResponse(method);
+	res.setBody(cast(ubyte[])"<h1>Not Found</h1>");
+	auto data = res.generateData(404);
 	client.send(data);
       } catch (Exception e) {
 	writeln(e);
-      }
-      finally {
+      } finally {
 	client.shutdown(SocketShutdown.BOTH);
 	client.close();
       }

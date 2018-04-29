@@ -2,7 +2,6 @@ import std.socket;
 
 import std.stdio;
 import std.string;
-import std.array : array;
 
 class HTTPRequest {
   private:
@@ -29,12 +28,12 @@ class HTTPRequest {
   }
 
   string getPath() {
-    auto statusLine = lineSplitter(data_).array[0];
+    auto statusLine = data_.split("\r\n")[0];
     return statusLine.split(" ")[1];
   }
 
   string getMethod() {
-    auto statusLine = lineSplitter(data_).array[0];
+    auto statusLine = data_.split("\r\n")[0];
     return statusLine.split(" ")[0];
   }
 
