@@ -3,6 +3,7 @@ import std.socket;
 import std.conv;
 import std.path;
 import std.file;
+import core.thread;
 import std.algorithm: canFind;
 import dyaml;
 import std.experimental.logger;
@@ -43,6 +44,11 @@ class Server {
 
     while(1) {
       Socket client = server_.accept();
+      new Thread(() => process(client)).start;
+    }
+  }
+
+  void process(Socket client) {
       HTTPRequest req = new HTTPRequest(client);
       // TODO: Fix it
       req.read();
@@ -87,7 +93,6 @@ class Server {
 	client.shutdown(SocketShutdown.BOTH);
 	client.close();
       }
-    }
   }
 
   string getLocalFile(string path) {
