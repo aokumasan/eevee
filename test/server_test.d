@@ -62,12 +62,20 @@ unittest {
 	rs.responseHeaders["content-type"].shouldEqual("text/html; charset=utf-8");
 	rs.responseBody.shouldEqual("");
     }),
-    it("Should return 404 NotFound if specified path is not found", delegate() {
+    it("Should return 404 (Not Found) if specified path is not found", delegate() {
 	Request rq = Request();
 	Response rs = rq.exec!"HEAD"("http://localhost:8080/notfoundpath.html");
 	rs.code.shouldEqual(404);
 	rs.responseHeaders["content-type"].shouldEqual("text/html; charset=utf-8");
+	rs.responseBody.shouldEqual("<h1>Not Found</h1>");
     }),
+    it("Should return 405 (Method Not Allowed) if specified method is not GET or HEAD", delegate() {
+	Request rq = Request();
+	Response rs = rq.post("http://localhost:8080/");
+	rs.code.shouldEqual(405);
+	rs.responseHeaders["content-type"].shouldEqual("text/html; charset=utf-8");
+	rs.responseBody.shouldEqual("<h1>Method Not Allowed</h1>");
+    })
   );
 }
 
