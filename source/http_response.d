@@ -9,7 +9,7 @@ class HTTPResponse {
   private:
   string method_;
   string[string] header_;
-  ubyte[] body_;
+  ubyte[] data_;
 
   public:
   this(string method="GET") {
@@ -21,7 +21,7 @@ class HTTPResponse {
   }
 
   int calcContentLength() {
-    return cast(int)(body_.length);
+    return cast(int)(data_.length);
   }
 
   string generateHeader() {
@@ -49,8 +49,8 @@ class HTTPResponse {
     header_.remove(key);
   }
 
-  void setBody(ubyte[] body) {
-    body_ = body;
+  void setBody(ubyte[] data) {
+    data_ = data;
   }
 
   string getContentType(string filepath) {
@@ -76,15 +76,15 @@ class HTTPResponse {
   }
 
   string generateData(int code) {
-    string data = "";
-    data ~= generateStatusLine(code);
-    data ~= generateHeader();
-    data ~= "\r\n";
+    string res = "";
+    res ~= generateStatusLine(code);
+    res ~= generateHeader();
+    res ~= "\r\n";
     if (method_ == "HEAD") {
-      return data;
+      return res;
     }
-    data ~= cast(string)body_;
-    return data;
+    res ~= cast(string)data_;
+    return res;
   }
 
 }
