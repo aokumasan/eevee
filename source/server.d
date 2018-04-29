@@ -44,9 +44,9 @@ class Server {
       // TODO: Fix it
       req.read();
 
-      string method;
-      string path;
       try {
+	string method;
+	string path;
 	method = req.getMethod();
 	if (!availableMethods.canFind(method)) {
 	  throw new  MethodNotAllowedException("The specified method is not allowed");
@@ -57,13 +57,13 @@ class Server {
 	auto data = res.generateData(200);
 	client.send(data);
       } catch (FileException e) {
-	HTTPResponse res = new HTTPResponse(method);
+	HTTPResponse res = new HTTPResponse();
 	res.setHeader("Content-Type", "text/html; charset=utf-8");
 	res.setBody(cast(ubyte[])"<h1>Not Found</h1>");
 	auto data = res.generateData(404);
 	client.send(data);
       } catch (MethodNotAllowedException e) {
-	HTTPResponse res = new HTTPResponse(method);
+	HTTPResponse res = new HTTPResponse();
 	res.setHeader("Content-Type", "text/html; charset=utf-8");
 	res.setBody(cast(ubyte[])"<h1>Method Not Allowed</h1>");
 	auto data = res.generateData(405);
