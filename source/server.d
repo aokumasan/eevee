@@ -43,6 +43,7 @@ class Server {
 	client.send(data);
       } catch (FileException e) {
 	HTTPResponse res = new HTTPResponse(method);
+	res.setHeader("Content-Type", "text/html; charset=utf-8");
 	res.setBody(cast(ubyte[])"<h1>Not Found</h1>");
 	auto data = res.generateData(404);
 	client.send(data);
