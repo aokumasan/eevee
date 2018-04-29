@@ -31,19 +31,12 @@ class Server {
 	HTTPRequest req = new HTTPRequest(client);
 	// TODO: Fix it
 	req.read();
-	writeln("* request acceptted");
 
-	HTTPResponse res = new HTTPResponse();
+	string method = req.getMethod();
 	string path = req.getPath();
-	string filepath;
-	if (path == "/") {
-	  filepath = "./public/index.html";
-	} else {
-	  filepath = "./public" ~ buildNormalizedPath(path);
-	}
-	res.setBodyFromPath(filepath);
+	HTTPResponse res = new HTTPResponse(method);
+	res.setBodyFromPath(getLocalFile(path));
 	auto data = res.generateData();
-	writeln("* response sending");
 	client.send(data);
       } catch (Exception e) {
 	writeln(e);
@@ -53,6 +46,14 @@ class Server {
 	client.close();
       }
     }
+  }
+
+  string getLocalFile(string path) {
+    const string root = "./public";
+    if (path == "/") {
+      return root  ~ "/index.html";
+    }
+    return root ~ buildNormalizedPath(path);
   }
 
 }

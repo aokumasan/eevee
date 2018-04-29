@@ -54,6 +54,13 @@ unittest {
 	rs.responseHeaders["content-type"].shouldEqual("image/png");
 	auto image = cast(ubyte[])read("./public/img/parrot.png");
 	rs.responseBody.shouldEqual(cast(string)image);
+    }),
+    it("Should return HEAD response", delegate() {
+	Request rq = Request();
+	Response rs = rq.exec!"HEAD"("http://localhost:8080/");
+	rs.code.shouldEqual(200);
+	rs.responseHeaders["content-type"].shouldEqual("text/html; charset=utf-8");
+	rs.responseBody.shouldEqual("");
     })
   );
 }

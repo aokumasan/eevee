@@ -7,10 +7,15 @@ import std.file;
 
 class HTTPResponse {
   private:
+  string method_;
   string[string] header_;
   ubyte[] body_;
 
   public:
+  this(string method="GET") {
+    method_ = method;
+  }
+
   void setHeader(string key, string value) {
     header_[key] = value;
   }
@@ -68,6 +73,9 @@ class HTTPResponse {
     data ~= generateStatusLine();
     data ~= generateHeader();
     data ~= "\r\n";
+    if (method_ == "HEAD") {
+      return data;
+    }
     data ~= cast(string)body_;
     return data;
   }
