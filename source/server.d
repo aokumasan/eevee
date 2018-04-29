@@ -2,7 +2,9 @@ import std.stdio;
 import std.socket;
 import std.conv;
 import std.path;
+import std.string;
 import std.file;
+import std.typecons : No;
 import core.thread;
 import std.algorithm: canFind;
 import std.experimental.logger;
@@ -32,7 +34,7 @@ class Server {
     setupLogger();
   }
 
-  void run(ushort port=8080, int maxConnections=512, ) {
+  void run(ushort port=8080, int maxConnections=512) {
     server_.bind(new InternetAddress(port));
     server_.listen(maxConnections);
 
@@ -66,12 +68,21 @@ class Server {
 	// log(LogLevel.trace, req.data);
 	client.send(data);
       } catch (FileException e) {
-	HTTPResponse res = new HTTPResponse();
-	res.setHeader("Content-Type", "text/html; charset=utf-8");
-	res.setBody(cast(ubyte[])"<h1>Not Found</h1>");
-	auto data = res.generateData(404);
-	logf(LogLevel.info, "%s %s HTTP/1.0 404", method, path);
-	client.send(data);
+	if (indexOf(e.msg, "No such file or directory") == -1) {
+	  HTTPResponse res = new HTTPResponse();
+	  res.setHeader("Content-Type", "text/html; charset=utf-8");
+	  res.setBody(cast(ubyte[])"<h1>Internal Server Error</h1>");
+	  auto data = res.generateData(500);
+	  logf(LogLevel.info, "%s %s HTTP/1.0 500", method, path);
+	  client.send(data);
+	} else {
+	  HTTPResponse res = new HTTPResponse();
+	  res.setHeader("Content-Type", "text/html; charset=utf-8");
+	  res.setBody(cast(ubyte[])"<h1>Not Found</h1>");
+	  auto data = res.generateData(404);
+	  logf(LogLevel.info, "%s %s HTTP/1.0 404", method, path);
+	  client.send(data);
+	}
       } catch (MethodNotAllowedException e) {
 	HTTPResponse res = new HTTPResponse();
 	res.setHeader("Content-Type", "text/html; charset=utf-8");
