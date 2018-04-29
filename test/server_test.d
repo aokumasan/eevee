@@ -61,7 +61,13 @@ unittest {
 	rs.code.shouldEqual(200);
 	rs.responseHeaders["content-type"].shouldEqual("text/html; charset=utf-8");
 	rs.responseBody.shouldEqual("");
-    })
+    }),
+    it("Should return 404 NotFound if specified path is not found", delegate() {
+	Request rq = Request();
+	Response rs = rq.exec!"HEAD"("http://localhost:8080/notfoundpath.html");
+	rs.code.shouldEqual(404);
+	rs.responseHeaders["content-type"].shouldEqual("text/html; charset=utf-8");
+    }),
   );
 }
 
