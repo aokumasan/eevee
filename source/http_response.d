@@ -16,6 +16,11 @@ class HTTPResponse {
     method_ = method;
   }
 
+  @property
+  {
+    ubyte[] data() { return data_; }
+  }
+
   void setHeader(string key, string value) {
     header_[key] = value;
   }

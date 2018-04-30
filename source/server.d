@@ -27,6 +27,7 @@ class MethodNotAllowedException : Exception
 class Server {
   private:
   Socket server_;
+  string[string] cache_;
 
   public:
   this() {
@@ -55,21 +56,27 @@ class Server {
       string method;
       string path;
       try {
-	method = req.getMethod();
-	if (!availableMethods.canFind(method)) {
-	  throw new  MethodNotAllowedException("The specified method is not allowed");
-	}
-	path = req.getPath();
-	HTTPResponse res = new HTTPResponse(method);
-	res.setBodyFromPath(getLocalFile(path));
-	auto data = res.generateData(200);
-	logf(LogLevel.info, "%s %s HTTP/1.0 200", method, path);
-	client.send(data);
-      } catch (FileException e) {
-	if (indexOf(e.msg, "No such file or directory") == -1) {
-	  logf(LogLevel.info, "%s %s HTTP/1.0 500", method, path);
-	  handleInternalServerError(client);
+        method = req.getMethod();
+        if (!availableMethods.canFind(method)) {
+          throw new  MethodNotAllowedException("The specified method is not allowed");
+        }
+        path = req.getPath();
+        HTTPResponse res = new HTTPResponse(method);
+        if (cache_.get(path, null) != null) {
+	  writeln("using cache");
+	  res.setBody(cast(ubyte[])cache_[path]);
 	} else {
+	  res.setBodyFromPath(getLocalFile(path));
+	  cache_[path] = cast(string)res.data;
+	}
+        string data = res.generateData(200);
+        logf(LogLevel.info, "%s %s HTTP/1.0 200", method, path);
+        client.send(data);
+      } catch (FileException e) {
+        if (indexOf(e.msg, "No such file or directory") == -1) {
+          logf(LogLevel.info, "%s %s HTTP/1.0 500", method, path);
+          handleInternalServerError(client);
+        } else {
 	  logf(LogLevel.info, "%s %s HTTP/1.0 404", method, path);
 	  handleNotFoundError(client);
 	}
