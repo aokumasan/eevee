@@ -22,8 +22,8 @@ class HTTPRequest {
   string read() {
     // TODO: Fix buffer length to read
     char[1024] buffer;
-    client_.receive(buffer);
-    string b = to!string(buffer);
+    long received = client_.receive(buffer);
+    string b = to!string(buffer[0 .. received]);
     data_ = b;
     return b;
   }
