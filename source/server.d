@@ -41,7 +41,7 @@ class Server {
 
     log(LogLevel.info, "Eevee listening on " ~ port.to!string);
 
-    while(1) {
+    while(true) {
       Socket client = server_.accept();
       auto task = task(&process, client);
       task.executeInNewThread();
@@ -50,7 +50,6 @@ class Server {
 
   void process(Socket client) {
       HTTPRequest req = new HTTPRequest(client);
-      // TODO: Fix it
       req.read();
 
       string method;
@@ -65,39 +64,22 @@ class Server {
 	res.setBodyFromPath(getLocalFile(path));
 	auto data = res.generateData(200);
 	logf(LogLevel.info, "%s %s HTTP/1.0 200", method, path);
-	// log(LogLevel.trace, req.data);
 	client.send(data);
       } catch (FileException e) {
 	if (indexOf(e.msg, "No such file or directory") == -1) {
-	  HTTPResponse res = new HTTPResponse();
-	  res.setHeader("Content-Type", "text/html; charset=utf-8");
-	  res.setBody(cast(ubyte[])"<h1>Internal Server Error</h1>");
-	  auto data = res.generateData(500);
 	  logf(LogLevel.info, "%s %s HTTP/1.0 500", method, path);
-	  client.send(data);
+	  handleInternalServerError(client);
 	} else {
-	  HTTPResponse res = new HTTPResponse();
-	  res.setHeader("Content-Type", "text/html; charset=utf-8");
-	  res.setBody(cast(ubyte[])"<h1>Not Found</h1>");
-	  auto data = res.generateData(404);
 	  logf(LogLevel.info, "%s %s HTTP/1.0 404", method, path);
-	  client.send(data);
+	  handleNotFoundError(client);
 	}
       } catch (MethodNotAllowedException e) {
-	HTTPResponse res = new HTTPResponse();
-	res.setHeader("Content-Type", "text/html; charset=utf-8");
-	res.setBody(cast(ubyte[])"<h1>Method Not Allowed</h1>");
-	auto data = res.generateData(405);
 	logf(LogLevel.info, "%s %s HTTP/1.0 405", method, path);
-	client.send(data);
+	handleMethodNotAllowedError(client);
       } catch (Exception e) {
 	writeln(e);
-	HTTPResponse res = new HTTPResponse();
-	res.setHeader("Content-Type", "text/html; charset=utf-8");
-	res.setBody(cast(ubyte[])"<h1>Internal Server Error</h1>");
-	auto data = res.generateData(500);
 	logf(LogLevel.info, "%s %s HTTP/1.0 500", method, path);
-	client.send(data);
+	handleInternalServerError(client);
       } finally {
 	client.shutdown(SocketShutdown.BOTH);
 	client.close();
@@ -138,6 +120,30 @@ class Server {
       string logfile = "log/eevee.log";
       sharedLog = new FileLogger(logfile);
     }
+  }
+
+  void handleNotFoundError(Socket client) {
+    HTTPResponse res = new HTTPResponse();
+    res.setHeader("Content-Type", "text/html; charset=utf-8");
+    res.setBody(cast(ubyte[])"<h1>Not Found</h1>");
+    string data = res.generateData(404);
+    client.send(data);
+  }
+
+  void handleMethodNotAllowedError(Socket client) {
+    HTTPResponse res = new HTTPResponse();
+    res.setHeader("Content-Type", "text/html; charset=utf-8");
+    res.setBody(cast(ubyte[])"<h1>Method Not Allowed</h1>");
+    auto data = res.generateData(405);
+    client.send(data);
+  }
+
+  void handleInternalServerError(Socket client) {
+    HTTPResponse res = new HTTPResponse();
+    res.setHeader("Content-Type", "text/html; charset=utf-8");
+    res.setBody(cast(ubyte[])"<h1>Internal Server Error</h1>");
+    string data = res.generateData(500);
+    client.send(data);
   }
 
 }
