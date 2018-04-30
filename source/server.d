@@ -8,6 +8,7 @@ import std.typecons : No;
 import core.thread;
 import std.algorithm: canFind;
 import std.experimental.logger;
+import std.parallelism;
 
 import http_request;
 import http_response;
@@ -42,9 +43,8 @@ class Server {
 
     while(1) {
       Socket client = server_.accept();
-      new Thread(() => process(client)).start;
-      // Workaround for using socket in thread
-      Thread.sleep( dur!("usecs")(1000) );
+      auto task = task(&process, client);
+      task.executeInNewThread();
     }
   }
 
